@@ -138,7 +138,7 @@ const BlogSettingsModal: React.FC<BlogSettingsModalProps> = ({ visible, onClose,
           <Button type="primary" htmlType="submit" size="large" style={{ width: "100px", marginRight: "8px" }}>
             发布
           </Button>
-          <Button type="default" size="large" style={{ width: "100px" }} onClick={onClose}>
+          <Button type="default" size="large" style={{ width: "100px" }} onClick={handleSave}>
             保存
           </Button>
         </Form.Item>

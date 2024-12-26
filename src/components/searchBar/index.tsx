@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Form, Input, Button } from "antd";
+import React from "react";
+import { Form, Button } from "antd";
 interface PropsType {
   handlerAction: () => void;
   onSearch: () => void;

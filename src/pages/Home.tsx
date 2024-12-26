@@ -3,7 +3,7 @@ import LeftNav from "../components/LeftNav"; // Adjust the import path as necess
 import { Outlet } from "react-router-dom";
 import AdminHeader from "../components/AdminHeader";
 const menuItems = [
-  { key: "0", label: "系统概览" },
+  { key: "0", label: "系统概览", route: "/admin" },
 
   {
     key: "1",

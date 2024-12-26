@@ -1,7 +1,8 @@
 // src/Router.tsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import routes, { RouteType } from "./routes";
+import { RouteType } from "./type";
+import routes from "./routes";
 
 const renderRoutes = (routes: RouteType[]) => {
   return routes.map((route, index) => {

@@ -16,3 +16,21 @@ export interface AddBlogCategoryType {
   onSubmit: (category: string) => void;
   onClose: () => void;
 }
+
+export interface RouteType {
+  path: string;
+  element: React.ReactNode;
+  children?: RouteType[];
+  default?: boolean;
+}
+
+export interface MenuItem {
+  key: string;
+  label: string;
+  route?: string;
+  children?: MenuItem[];
+}
+
+export interface LeftNavProps {
+  menuItems: MenuItem[];
+}

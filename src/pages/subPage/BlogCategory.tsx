@@ -1,6 +1,6 @@
 // 博客分类管理页面
 import React, { useState } from "react";
-import { Table, Switch, Button, Form, Input } from "antd";
+import { Table, Button, Form, Input } from "antd";
 import { Blog } from "../../type";
 import SearchBar from "../../components/searchBar";
 import AddBlogCategory from "../../components/AddBlogCategory";
