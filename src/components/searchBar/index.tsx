@@ -4,10 +4,12 @@ interface PropsType {
   handlerAction: () => void;
   onSearch: () => void;
   Component: React.ReactNode;
+  showRightButton?: boolean;
 }
 
-const SearchBar: React.FC<PropsType> = ({ handlerAction, onSearch, Component }) => {
+const SearchBar: React.FC<PropsType> = ({ handlerAction, onSearch, Component, showRightButton = true }) => {
   const [form] = Form.useForm();
+  console.log("showRightButton", showRightButton);
 
   const handleSearchSubmit = (values: { id: string; blogName: string }) => {
     console.log("Search values:", values);
@@ -33,11 +35,13 @@ const SearchBar: React.FC<PropsType> = ({ handlerAction, onSearch, Component }) 
           重置
         </Button>
       </Form.Item>
-      <Form.Item className="ml-auto">
-        <Button type="primary" onClick={action}>
-          新增
-        </Button>
-      </Form.Item>
+      {showRightButton && (
+        <Form.Item className="ml-auto">
+          <Button type="primary" onClick={action}>
+            新增
+          </Button>
+        </Form.Item>
+      )}
     </Form>
   );
 };

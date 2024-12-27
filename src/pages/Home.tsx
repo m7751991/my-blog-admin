@@ -19,7 +19,7 @@ const menuItems = [
     label: "模块管理",
     children: [
       { key: "2-1", label: "友情链接", route: "/admin/friendLink" },
-      { key: "2-2", label: "轮播图管理", route: "/admin/systemSetting" },
+      { key: "2-2", label: "轮播图管理", route: "/admin/carouselManager" },
     ],
   },
   {

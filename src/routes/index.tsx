@@ -11,6 +11,12 @@ const CreateBlog = lazy(() => import("../pages/CreateBlog"));
 const System = lazy(() => import("../pages/System"));
 const Login = lazy(() => import("../pages/Login"));
 const NotFound = lazy(() => import("../pages/NotFound"));
+const CarouselManager = lazy(() => import("../pages/subPage/CarouselManager"));
+const FriendLink = lazy(() => import("../pages/subPage/FriendLink"));
+// const PermissionList = lazy(() => import("../pages/subPage/PermissionList"));
+// const PermissionAssign = lazy(() => import("../pages/subPage/PermissionAssign"));
+// const UserManager = lazy(() => import("../pages/subPage/UserManager"));
+// const SystemSetting = lazy(() => import("../pages/subPage/SystemSetting"));
 
 const routes: RouteType[] = [
   {
@@ -29,10 +35,17 @@ const routes: RouteType[] = [
       { path: "/admin/blogComment", element: <BlogComment /> }, // Nested route example
       { path: "/admin/blogCategory", element: <BlogCategory /> }, // Nested route example
       { path: "/admin/system", element: <System /> }, // Nested route example
+      { path: "/admin/carouselManager", element: <CarouselManager /> },
+      { path: "/admin/friendLink", element: <FriendLink /> },
+      // { path: "/permissionList", element: <PermissionList /> },
+      // { path: "/permissionAssign", element: <PermissionAssign /> },
+      // { path: "/userManager", element: <UserManager /> },
+      // { path: "/systemSetting", element: <SystemSetting /> },
     ],
   },
   { path: "/login", element: <Login /> },
   { path: "/createBlog", element: <CreateBlog /> },
+
   { path: "*", element: <NotFound /> },
 ];
 
