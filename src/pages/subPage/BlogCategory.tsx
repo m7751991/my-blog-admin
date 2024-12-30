@@ -1,45 +1,33 @@
 // 博客分类管理页面
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Form, Input } from "antd";
-import { Blog } from "../../type";
+import { BlogModelType, CategoryType, CategorySearchDataType } from "../../type";
 import SearchBar from "../../components/searchBar";
 import AddBlogCategory from "../../components/AddBlogCategory";
+import { createResource, fetchData, updateResource, deleteResource } from "../../fetch";
+import dayjs from "dayjs";
 
 const BlogCategory: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const blogData: Blog[] = [
-    {
-      key: 1,
-      name: "Blog Post 1",
-      publishDate: "2023-01-01",
-      status: "Published",
-      tags: ["React", "JavaScript"],
-      category: "Tech",
-      isPinned: true,
-      isPopular: false,
-      isRecommended: true,
-      accessMode: "Public",
-    },
-    {
-      key: 2,
-      name: "Blog Post 2",
-      publishDate: "2023-02-01",
-      status: "Draft",
-      tags: ["CSS", "Design"],
-      category: "Design",
-      isPinned: false,
-      isPopular: true,
-      isRecommended: false,
-      accessMode: "Private",
-    },
-    // Add more blog data as needed
-  ];
+  const [blogData, setBlogData] = useState<BlogModelType[]>([]);
+  const [defaultValues, setDefaultValues] = useState<CategoryType | undefined>(undefined);
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async (searchData?: CategorySearchDataType) => {
+    const { data } = await fetchData<BlogModelType[], CategorySearchDataType>("/category", searchData);
+    if (data) {
+      setBlogData(data);
+    }
+  };
 
   const columns = [
     {
       title: "ID",
-      dataIndex: "key",
-      key: "key",
+      dataIndex: "id",
+      key: "id",
     },
     {
       title: "类别名称",
@@ -47,9 +35,18 @@ const BlogCategory: React.FC = () => {
       key: "name",
     },
     {
-      title: "发布日期",
-      dataIndex: "publishDate",
-      key: "publishDate",
+      title: "创建时间",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text: string) => {
+        return text ? dayjs(text).format("YYYY-MM-DD HH:mm:ss") : "-";
+      },
+    },
+    {
+      title: "更新时间",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (text: string) => (text ? dayjs(text).format("YYYY-MM-DD HH:mm:ss") : "-"),
     },
     {
       title: "博客数目",
@@ -59,44 +56,68 @@ const BlogCategory: React.FC = () => {
     {
       title: "操作",
       key: "action",
-      render: () => (
+      render: (text: string, record: any) => (
         <span>
-          <Button type="primary">编辑</Button>
-          <Button type="primary" danger className="ml-8">
+          <Button type="primary" onClick={() => edit(record)}>
+            编辑
+          </Button>
+          <Button type="primary" danger className="ml-8" onClick={() => deleteAction(record)}>
             删除
           </Button>
         </span>
       ),
     },
   ];
-  const handlerSearch = () => {
-    console.log("搜索");
+  const edit = (record: any) => {
+    console.log("编辑", record);
+    setOpen(true);
+    setDefaultValues(record);
+  };
+  const deleteAction = async (record: any) => {
+    console.log("删除", record);
+    const { data, status } = await deleteResource(`/category/${record.id}`);
+    if (status) {
+      getData();
+    }
+  };
+  const handlerSearch = (searchData?: CategorySearchDataType) => {
+    console.log("搜索", searchData);
+    getData(searchData);
   };
   const openBlogCategory = () => {
     setOpen(true);
   };
-  const onSubmit = () => {};
+  const onSubmit = async (category: CategoryType) => {
+    console.log(category, "category");
+    if (defaultValues) {
+      updateResource(`/category/${defaultValues.id}`, category);
+    } else {
+      createResource("/category", category);
+    }
+    getData();
+  };
   const closeBlogCategory = () => {
     setOpen(false);
+    setDefaultValues(undefined);
   };
   return (
     <div>
       <SearchBar
         handlerAction={openBlogCategory}
-        onSearch={() => handlerSearch()}
+        onSearch={handlerSearch}
         Component={
           <>
             <Form.Item name="id" label="ID">
               <Input placeholder="Search by ID" />
             </Form.Item>
-            <Form.Item name="blogName" label="博客名称">
+            <Form.Item name="name" label="类别名称">
               <Input placeholder="Search by Blog Name" />
             </Form.Item>
           </>
         }
       />
       <Table columns={columns} dataSource={blogData} />
-      <AddBlogCategory open={open} onSubmit={onSubmit} onClose={closeBlogCategory} />
+      <AddBlogCategory open={open} onSubmit={onSubmit} defaultValues={defaultValues} onClose={closeBlogCategory} />
     </div>
   );
 };

@@ -1,20 +1,16 @@
-export interface Blog {
-  key: number;
-  name: string;
-  publishDate: string;
-  status: string;
-  tags: string[];
-  category: string;
-  isPinned: boolean;
-  isPopular: boolean;
-  isRecommended: boolean;
-  accessMode: string;
-}
-
 export interface AddBlogCategoryType {
   open: boolean;
-  onSubmit: (category: string) => void;
+  onSubmit: (category: CategoryType) => void;
   onClose: () => void;
+  defaultValues?: CategoryType;
+}
+
+export interface CategoryType {
+  id?: number;
+  name: string;
+  description: string;
+  createdAt: Date;
+  updatedAt?: Date;
 }
 
 export interface RouteType {
@@ -33,4 +29,29 @@ export interface MenuItem {
 
 export interface LeftNavProps {
   menuItems: MenuItem[];
+}
+
+export interface BlogModelType {
+  title: string;
+  content: string;
+  authorId?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  coverImage?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+  categoryId?: number;
+  summary?: string;
+  tags?: string[];
+  accessMode?: string;
+  allowReprint?: boolean;
+  isPublic?: boolean;
+  isPinned?: boolean;
+  immediatePublish?: boolean;
+  allowComments?: boolean;
+}
+
+export interface CategorySearchDataType {
+  name?: string;
+  id?: number;
 }

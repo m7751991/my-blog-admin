@@ -1,19 +1,18 @@
 import React from "react";
 import { Form, Button } from "antd";
-interface PropsType {
+interface PropsType<T> {
   handlerAction: () => void;
-  onSearch: () => void;
+  onSearch: (searchData?: T) => void;
   Component: React.ReactNode;
   showRightButton?: boolean;
 }
-
-const SearchBar: React.FC<PropsType> = ({ handlerAction, onSearch, Component, showRightButton = true }) => {
+const SearchBar: <T>(props: PropsType<T>) => JSX.Element = ({ handlerAction, onSearch, Component, showRightButton = true }) => {
   const [form] = Form.useForm();
   console.log("showRightButton", showRightButton);
 
-  const handleSearchSubmit = (values: { id: string; blogName: string }) => {
+  const handleSearchSubmit = (values: any) => {
     console.log("Search values:", values);
-    onSearch();
+    onSearch(values);
   };
 
   const handleReset = () => {

@@ -1,53 +1,34 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Switch, Button, Form, Input } from "antd";
-import { Blog } from "../../type";
-
+import { BlogModelType } from "../../type";
+import { fetchData } from "../../fetch";
 import SearchBar from "../../components/searchBar";
 
 const BlogCategory: React.FC = () => {
-  const blogData: Blog[] = [
-    {
-      key: 1,
-      name: "Blog Post 1",
-      publishDate: "2023-01-01",
-      status: "Published",
-      tags: ["React", "JavaScript"],
-      category: "Tech",
-      isPinned: true,
-      isPopular: false,
-      isRecommended: true,
-      accessMode: "Public",
-    },
-    {
-      key: 2,
-      name: "Blog Post 2",
-      publishDate: "2023-02-01",
-      status: "Draft",
-      tags: ["CSS", "Design"],
-      category: "Design",
-      isPinned: false,
-      isPopular: true,
-      isRecommended: false,
-      accessMode: "Private",
-    },
-    // Add more blog data as needed
-  ];
+  const [blogData, setBlogData] = useState<BlogModelType[]>([]);
+  useEffect(() => {
+    const fetchBlogData = async () => {
+      const { data } = await fetchData<BlogModelType[], undefined>("/blogs");
+      data && setBlogData(data);
+    };
+    fetchBlogData();
+  }, []);
 
   const columns = [
     {
       title: "ID",
-      dataIndex: "key",
-      key: "key",
+      dataIndex: "id", // Changed from "key" to "id"
+      key: "id", // Changed from "key" to "id"
     },
     {
       title: "博客名称",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "title",
+      key: "title",
     },
     {
       title: "发布日期",
-      dataIndex: "publishDate",
-      key: "publishDate",
+      dataIndex: "createdAt", // Changed from "publishDate" to "createdAt"
+      key: "createdAt", // Changed from "publishDate" to "createdAt"
     },
     {
       title: "状态",
@@ -58,12 +39,12 @@ const BlogCategory: React.FC = () => {
       title: "标签",
       dataIndex: "tags",
       key: "tags",
-      render: (tags: string[]) => tags.join(", "),
+      render: (tags: string[]) => tags?.join(", "),
     },
     {
       title: "所属分类",
-      dataIndex: "category",
-      key: "category",
+      dataIndex: "categoryId", // Changed from "category" to "categoryId"
+      key: "categoryId", // Changed from "category" to "categoryId"
     },
     {
       title: "置顶",
@@ -111,7 +92,7 @@ const BlogCategory: React.FC = () => {
         handlerAction={() => {
           window.open("/createBlog", "_blank");
         }}
-        onSearch={() => handlerSearch()}
+        onSearch={handlerSearch}
         Component={
           <>
             <Form.Item name="id" label="ID">

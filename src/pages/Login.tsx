@@ -1,19 +1,32 @@
 import React, { useState } from "react";
 import Register from "../components/Register";
 import { useNavigate } from "react-router-dom";
-import CryptoJS from "crypto-js";
+import { useDispatch } from "react-redux";
+// import CryptoJS from "crypto-js";
+import { createResource } from "../fetch";
+import { login } from "../store/authSlice";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const hashedPassword = CryptoJS.SHA256(password).toString();
-    console.log("Logging in with:", { username, hashedPassword });
-    navigate("/admin", { replace: true });
+    console.log("Logging in with:", { username, password });
+    const { code, data, error } = await createResource<{ token: string; user: { username: string; password: string; id: string } }, { username: string; password: string }>("/login", {
+      username,
+      password,
+    });
+    console.log(data);
+    if (code === 200 && data) {
+      localStorage.setItem("authorization", data?.token);
+      dispatch(login({ user: data.user }));
+      navigate("/admin", { replace: true });
+    } else {
+      // message.error(error);
+    }
   };
 
   return (
