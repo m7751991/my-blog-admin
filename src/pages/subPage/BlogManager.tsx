@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { Table, Switch, Button, Form, Input } from "antd";
-import { BlogModelType } from "../../type";
-import { fetchData } from "../../fetch";
+import { BlogModelType, BlogSearchDataType } from "../../type";
+import { deleteResource, fetchData } from "../../fetch";
 import SearchBar from "../../components/searchBar";
+import dayjs from "dayjs";
 
 const BlogCategory: React.FC = () => {
   const [blogData, setBlogData] = useState<BlogModelType[]>([]);
   useEffect(() => {
-    const fetchBlogData = async () => {
-      const { data } = await fetchData<BlogModelType[], undefined>("/blogs");
-      data && setBlogData(data);
-    };
     fetchBlogData();
   }, []);
+
+  const fetchBlogData = async (query?: BlogSearchDataType) => {
+    const { data } = await fetchData<BlogModelType[], BlogSearchDataType>("/admin/blogs", query);
+    data && setBlogData(data);
+  };
+
+  const deleteBlog = async (record: BlogModelType) => {
+    await deleteResource(`/blogs/${record.id}`);
+    fetchBlogData();
+  };
+
+  const editBlog = (record: BlogModelType) => {
+    console.log(record, "record");
+    window.open(`/createBlog/${record.id}`, "_blank");
+  };
 
   const columns = [
     {
@@ -29,53 +41,56 @@ const BlogCategory: React.FC = () => {
       title: "发布日期",
       dataIndex: "createdAt", // Changed from "publishDate" to "createdAt"
       key: "createdAt", // Changed from "publishDate" to "createdAt"
+      render: (value: number) => dayjs(value).format("YYYY-MM-DD HH:mm:ss"),
+    },
+    {
+      title: "更新日期",
+      dataIndex: "updatedAt", // Changed from "publishDate" to "createdAt"
+      key: "updatedAt", // Changed from "publishDate" to "createdAt"
+      render: (value: number) => (value ? dayjs(value).format("YYYY-MM-DD HH:mm:ss") : "-"),
     },
     {
       title: "状态",
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "statusText",
+      key: "statusText",
     },
     {
       title: "标签",
       dataIndex: "tags",
       key: "tags",
-      render: (tags: string[]) => tags?.join(", "),
     },
     {
       title: "所属分类",
-      dataIndex: "categoryId", // Changed from "category" to "categoryId"
-      key: "categoryId", // Changed from "category" to "categoryId"
+      dataIndex: "categoryName",
+      key: "categoryName",
     },
     {
       title: "置顶",
       dataIndex: "isPinned",
       key: "isPinned",
-      render: (isPinned: boolean) => <Switch checked={isPinned} />,
+      render: (value: boolean) => (value ? "是" : "否"),
     },
     {
-      title: "热门",
-      dataIndex: "isPopular",
-      key: "isPopular",
-      render: (isPopular: boolean) => <Switch checked={isPopular} />,
+      title: "是否公开",
+      dataIndex: "isPublic",
+      key: "isPublic",
+      render: (value: boolean) => (value ? "是" : "否"),
     },
     {
-      title: "推荐",
-      dataIndex: "isRecommended",
-      key: "isRecommended",
-      render: (isRecommended: boolean) => <Switch checked={isRecommended} />,
-    },
-    {
-      title: "访问模式",
-      dataIndex: "accessMode",
-      key: "accessMode",
+      title: "是否允许评论",
+      dataIndex: "allowComments",
+      key: "allowComments",
+      render: (value: boolean) => (value ? "是" : "否"),
     },
     {
       title: "操作",
       key: "action",
-      render: () => (
+      render: (record: BlogModelType) => (
         <span>
-          <Button type="primary">编辑</Button>
-          <Button type="primary" danger className="ml-8">
+          <Button type="primary" onClick={() => editBlog(record)}>
+            编辑
+          </Button>
+          <Button type="primary" danger className="ml-8" onClick={() => deleteBlog(record)}>
             删除
           </Button>
         </span>
@@ -83,8 +98,9 @@ const BlogCategory: React.FC = () => {
     },
   ];
 
-  const handlerSearch = () => {
+  const handlerSearch = (query: BlogSearchDataType | undefined) => {
     console.log("搜索");
+    fetchBlogData(query);
   };
   return (
     <div>
@@ -96,10 +112,10 @@ const BlogCategory: React.FC = () => {
         Component={
           <>
             <Form.Item name="id" label="ID">
-              <Input placeholder="Search by ID" />
+              <Input placeholder="请输入ID" />
             </Form.Item>
-            <Form.Item name="blogName" label="博客名称">
-              <Input placeholder="Search by Blog Name" />
+            <Form.Item name="title" label="博客名称">
+              <Input placeholder="请输入博客名称" />
             </Form.Item>
           </>
         }

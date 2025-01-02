@@ -69,30 +69,26 @@ const BlogCategory: React.FC = () => {
     },
   ];
   const edit = (record: any) => {
-    console.log("编辑", record);
     setOpen(true);
     setDefaultValues(record);
   };
   const deleteAction = async (record: any) => {
-    console.log("删除", record);
     const { data, status } = await deleteResource(`/category/${record.id}`);
     if (status) {
       getData();
     }
   };
   const handlerSearch = (searchData?: CategorySearchDataType) => {
-    console.log("搜索", searchData);
     getData(searchData);
   };
   const openBlogCategory = () => {
     setOpen(true);
   };
   const onSubmit = async (category: CategoryType) => {
-    console.log(category, "category");
     if (defaultValues) {
-      updateResource(`/category/${defaultValues.id}`, category);
+      await updateResource(`/category/${defaultValues.id}`, category);
     } else {
-      createResource("/category", category);
+      await createResource("/category", category);
     }
     getData();
   };
@@ -108,10 +104,10 @@ const BlogCategory: React.FC = () => {
         Component={
           <>
             <Form.Item name="id" label="ID">
-              <Input placeholder="Search by ID" />
+              <Input placeholder="请输入ID" />
             </Form.Item>
             <Form.Item name="name" label="类别名称">
-              <Input placeholder="Search by Blog Name" />
+              <Input placeholder="请输入类别名称" />
             </Form.Item>
           </>
         }

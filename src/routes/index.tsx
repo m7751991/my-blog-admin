@@ -13,6 +13,7 @@ const Login = lazy(() => import("../pages/Login"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 const CarouselManager = lazy(() => import("../pages/subPage/CarouselManager"));
 const FriendLink = lazy(() => import("../pages/subPage/FriendLink"));
+const Overview = lazy(() => import("../pages/subPage/Overview"));
 // const PermissionList = lazy(() => import("../pages/subPage/PermissionList"));
 // const PermissionAssign = lazy(() => import("../pages/subPage/PermissionAssign"));
 // const UserManager = lazy(() => import("../pages/subPage/UserManager"));
@@ -28,6 +29,7 @@ const routes: RouteType[] = [
     path: "/admin",
     element: <Home />,
     children: [
+      { path: "/admin", element: <Overview /> },
       {
         path: "/admin/blogManager",
         element: <BlogManager />,
@@ -44,8 +46,7 @@ const routes: RouteType[] = [
     ],
   },
   { path: "/login", element: <Login /> },
-  { path: "/createBlog", element: <CreateBlog /> },
-
+  { path: "/createBlog/:id?", element: <CreateBlog /> },
   { path: "*", element: <NotFound /> },
 ];
 

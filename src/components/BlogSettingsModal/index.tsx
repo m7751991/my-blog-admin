@@ -1,35 +1,56 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Drawer, Input, Button, Form, Select, Switch, DatePicker, Upload } from "antd";
 import dayjs from "dayjs";
-import { BlogModelType } from "../../type";
+import { BlogModelType, CategoryModelType } from "../../type";
+
+import { fetchData } from "../../fetch";
 const { TextArea } = Input;
 
 interface BlogSettingsModalProps {
   visible: boolean;
   onClose: () => void;
-  onSave: (settings: Omit<BlogModelType, "title" | "content">) => void;
+  onSave: (settings: Omit<BlogModelType, "title" | "content">, id: number | undefined) => void;
+  defaultValues: BlogModelType | null;
 }
 
-const BlogSettingsModal: React.FC<BlogSettingsModalProps> = ({ visible, onClose, onSave }) => {
+const BlogSettingsModal: React.FC<BlogSettingsModalProps> = React.memo(({ visible, onClose, onSave, defaultValues }) => {
   const [form] = Form.useForm();
+  const [categoryList, setCategoryList] = useState<CategoryModelType[]>([]);
 
   useEffect(() => {
-    form.setFieldsValue({
-      createdAt: dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-      accessMode: "public",
-      allowReprint: true,
-      isPublic: true,
-      isPinned: true,
-      immediatePublish: true,
-      allowComments: true,
-    });
-  }, [form]);
+    fetchCategoryList();
+    if (defaultValues) {
+      form.setFieldsValue({
+        ...defaultValues,
+      });
+    } else {
+      form.setFieldsValue({
+        createdAt: dayjs().toDate().getTime(),
+        accessMode: "public",
+        allowReprint: true,
+        isPublic: true,
+        isPinned: true,
+        immediatePublish: true,
+        allowComments: true,
+        categoryName: "",
+      });
+    }
+  }, [form, defaultValues]);
 
-  const handleSave = async () => {
+  const fetchCategoryList = async () => {
+    const result = await fetchData<CategoryModelType[], undefined>("/category");
+    setCategoryList(result.data || []);
+  };
+
+  const handleSave = async (isSave: boolean = false) => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue() as Omit<BlogModelType, "title" | "content">;
-      onSave(values);
+      console.log(values, "values");
+      values.categoryName = categoryList.find((item) => item.id === values.categoryId)?.name || "";
+      values.status = isSave ? 0 : 1;
+      console.log(values, "values");
+      onSave(values, defaultValues?.id);
     } catch (error) {
       console.log(error, "error");
     }
@@ -61,9 +82,11 @@ const BlogSettingsModal: React.FC<BlogSettingsModalProps> = ({ visible, onClose,
       name: "categoryId",
       component: (
         <Select placeholder="选择分类" style={{ width: 240 }}>
-          <Select.Option value="1">技术</Select.Option>
-          <Select.Option value="2">生活方式</Select.Option>
-          <Select.Option value="3">旅行</Select.Option>
+          {categoryList.map((item) => (
+            <Select.Option key={item.id} value={item.id}>
+              {item.name}
+            </Select.Option>
+          ))}
         </Select>
       ),
       required: true,
@@ -99,23 +122,13 @@ const BlogSettingsModal: React.FC<BlogSettingsModalProps> = ({ visible, onClose,
       component: <DatePicker format="YYYY-MM-DD HH:mm:ss" style={{ width: 240 }} showTime showNow />,
       getValueFromEvent: (...[, dateString]: any) => {
         console.log(dateString, "dateString");
-        return dateString;
+        return dayjs(dateString).toDate().getTime();
       },
       getValueProps: (value: any) => {
         return { value: value ? dayjs(value) : undefined };
       },
       rules: [{ required: true, message: "请选择发布时间!" }],
       require: true,
-    },
-    {
-      label: "访问模式",
-      name: "accessMode",
-      component: (
-        <Select placeholder="选择访问模式" style={{ width: 240 }}>
-          <Select.Option value="public">公开</Select.Option>
-          <Select.Option value="private">私密</Select.Option>
-        </Select>
-      ),
     },
     {
       label: "是否允许转载",
@@ -132,12 +145,6 @@ const BlogSettingsModal: React.FC<BlogSettingsModalProps> = ({ visible, onClose,
     {
       label: "是否置顶",
       name: "isPinned",
-      component: <Switch />,
-      valuePropName: "checked",
-    },
-    {
-      label: "立即发布",
-      name: "immediatePublish",
       component: <Switch />,
       valuePropName: "checked",
     },
@@ -167,16 +174,16 @@ const BlogSettingsModal: React.FC<BlogSettingsModalProps> = ({ visible, onClose,
           </Form.Item>
         ))}
         <Form.Item className="flex justify-end absolute bottom-0 right-25 left-0">
-          <Button type="primary" htmlType="submit" size="large" style={{ width: "100px", marginRight: "8px" }}>
+          <Button type="primary" htmlType="submit" size="large" style={{ width: "100px", marginRight: "8px" }} onClick={() => handleSave(false)}>
             发布
           </Button>
-          <Button type="default" size="large" style={{ width: "100px" }} onClick={handleSave}>
+          <Button type="default" size="large" style={{ width: "100px" }} onClick={() => handleSave(true)}>
             保存
           </Button>
         </Form.Item>
       </Form>
     </Drawer>
   );
-};
+});
 
 export default BlogSettingsModal;
